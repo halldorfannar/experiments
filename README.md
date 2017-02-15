@@ -2,26 +2,25 @@
 Nothing to see here. This is used for all kinds of experimentation and temporary work.
 
 ```cpp
-struct Configuration
-{  
-	// Called when user activates Ansel. Return kDisallowed if the game cannot comply with the
-	// request. If the function returns kAllowed the following must be done:
-	// 1. Change the SessionConfigruation settings, but only where you need to (the object
-	//    is already populated with default settings).
-	// 2. On the next update loop the game will be in an Ansel session. During an Ansel session 
-    //    the game :
-	//    a) Must stop drawing UI and HUD elements on the screen, including mouse cursor
-    //    b) Must call ansel::updateCamera on every frame
- 	//    c) Should pause rendering time (i.e. no movement should be visible in the world)
-  	//    d) Should not act on any input from mouse and keyboard and must not act on any input 
-  	//       from gamepads
-	// 3. Step 2 is repeated on every iteration of update loop until Session is stopped.
-	StartSessionCallback startSessionCallback;
+struct Camera
+{
+	// Position of camera, in the game's coordinate space
+	nv::Vec3 position;
+	// Rotation of the camera, in the game's coordinate space. I.e. if you apply this
+	// rotation to the default orientation of the game's camera you will get the current
+	// orientation of the camera (again, in game's coordinate space)
+	nv::Quat rotation;
+	// Field of view in degrees. This value is either vertical or horizontal field of
+	// view based on the 'fovType' setting passed in with setConfiguration.
+	float fov;
+	// The amount that the projection matrix needs to be offset by. These values are
+	// applied directly as translations to the projection matrix. These values are only
+	// non-zero during Highres capture.
+	float projectionOffsetX, projectionOffsetY;
+};
 
-	// Called when Ansel is deactivated. This call will only be made if the previous call
-	// to the startSessionCallback returned kAllowed.
-	// Normally games will use this callback to restore their camera to the settings it had 
-	// when the Ansel session was started.
-	StopSessionCallback stopSessionCallback;
-}
+// Must be called on every frame an Ansel session is active. The 'camera' must contain
+// the current display camera settings when called. After calling 'camera' will contain the
+// new requested camera from Ansel.
+ANSEL_SDK_API void updateCamera(Camera& camera);
 ``` 
