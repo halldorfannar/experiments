@@ -7,7 +7,7 @@ enum SetConfigurationStatus
   // successfully initialized the Ansel SDK
   kSetConfigurationSuccess,
 
-  // the version provided in the Configuration structure is not the same as the one stored         
+  // the version provided in the Configuration structure is not the same as the one stored       
   // inside the SDK binary (header/binary mismatch)
   kSetConfigurationIncompatibleVersion,
         
