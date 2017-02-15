@@ -2,25 +2,34 @@
 Nothing to see here. This is used for all kinds of experimentation and temporary work.
 
 ```cpp
-struct Camera
+if (g_isAnselSessionActive)
 {
-	// Position of camera, in the game's coordinate space
-	nv::Vec3 position;
-	// Rotation of the camera, in the game's coordinate space. I.e. if you apply this
-	// rotation to the default orientation of the game's camera you will get the current
-	// orientation of the camera (again, in game's coordinate space)
-	nv::Quat rotation;
-	// Field of view in degrees. This value is either vertical or horizontal field of
-	// view based on the 'fovType' setting passed in with setConfiguration.
-	float fov;
-	// The amount that the projection matrix needs to be offset by. These values are
-	// applied directly as translations to the projection matrix. These values are only
-	// non-zero during Highres capture.
-	float projectionOffsetX, projectionOffsetY;
-};
+  ansel::Camera cam;
+  cam.fov = get_game_fov_degrees();
+  cam.position = { game_cam_position.x, game_cam_position.y,
+                   game_cam_position.z };
+  cam.rotation = { game_cam_orientation.x,
+                   game_cam_orientation.y,
+                   game_cam_orientation.z,
+                   game_cam_orientation.w };
 
-// Must be called on every frame an Ansel session is active. The 'camera' must contain
-// the current display camera settings when called. After calling 'camera' will contain the
-// new requested camera from Ansel.
-ANSEL_SDK_API void updateCamera(Camera& camera);
+  ansel::updateCamera(cam);
+  // This is where a game would typically perform collision detection
+  // and adjust the values requested by player in cam.position 
+
+  game_cam_position.x = cam.position.x;
+  game_cam_position.y = cam.position.y;
+  game_cam_position.z = cam.position.z;
+
+  game_cam_orientation.x = cam.rotation.x;
+  game_cam_orientation.y = cam.rotation.y;
+  game_cam_orientation.z = cam.rotation.z;
+  game_cam_orientation.w = cam.rotation.w;
+
+  set_game_fov_degrees(cam.fov);
+
+  // modify projection matrices by the offset amounts -
+  // we will explore this in detail separately  
+  offset_game_projection_matrices(cam.projectionOffsetX, cam.projectionOffsetY);
+}
 ``` 
