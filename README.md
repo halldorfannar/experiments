@@ -2,23 +2,21 @@
 Nothing to see here. This is used for all kinds of experimentation and temporary work.
 
 ```cpp
-if (g_isAnselSessionActive)
+void offset_game_projection_matrices(float offsetX, float offsetY)
 {
-  ansel::Camera cam;
-  cam.fov = get_game_fov_degrees();
-  cam.position = {game_cam_position.x, game_cam_position.y, game_cam_position.z};
-  cam.rotation = {game_cam_orientation.x, game_cam_orientation.y, game_cam_orientation.z, game_cam_orientation.w};
+  // In this simple example we only need to modify the projection matrix associated with the game camera. 
+  // If the game is doing clever things like optimizing reflections or shadows based on projection matrix
+  // then those code paths need to take a non-zero projection offset into account.
 
-  ansel::updateCamera(cam);
-  // This is where a game would typically perform collision detection
-  // and adjust the values requested by player in cam.position 
+  // For nostalgia effect this game is using an old classic:
+  D3DXMATRIX projection;
+  D3DXMatrixPerspectiveFovRH(&projection, g_fov_radians, g_aspect, g_z_near, g_z_far)
 
-  game_cam_position = {cam.position.x, cam.position.y, cam.position.z};
-  game_cam_orientation = {cam.rotation.x, cam.rotation.y, cam.rotation.z, cam.rotation.w};
+  // Apply the offsets directly to the finished product (values are already normalized):
+  projection._31 += offsetX;
+  projection._32 += offsetY;
 
-  set_game_fov_degrees(cam.fov);
-
-  // modify projection matrices by the offset amounts
-  offset_game_projection_matrices(cam.projectionOffsetX, cam.projectionOffsetY);
+  // Update the games projection matrix:
+  g_projection_matrix = projection;
 }
 ``` 
