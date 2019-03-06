@@ -1,1 +1,6 @@
+Heading
+=======
 This is an AsciiDoc file.
+
+[source,cpp]
+include::source.cpp[]
